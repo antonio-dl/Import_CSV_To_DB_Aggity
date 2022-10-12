@@ -7,26 +7,21 @@ namespace Utilities
 {
     public class ImportManager
     {
-        public string ConnectionString { get; }
-        public char Separator { get; set; } = ',';
         private SqlConnection _dbconnection;
-        private string CSVPath { get; set; }
-        public string DestinationTable { get; private set; }
-
-        public ImportManager(string cSVPath, char separator, string destinationTable, string connectionString)
+        public ImportManager( string destinationTable, string connectionString)
         {
-            CSVPath = cSVPath ?? throw new ArgumentNullException(nameof(cSVPath));
-            Separator = separator;
             DestinationTable = destinationTable ?? throw new ArgumentNullException(nameof(destinationTable));
             ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
             _dbconnection = new SqlConnection(ConnectionString);
         }
 
-        public void ImportCSVToDatabase(string pathToCSV)
+        public string ConnectionString { get; }
+        public string DestinationTable { get; private set; }
+        public void ImportCSVToDatabase(string pathToCSV, char separator)
         {
             var csvText = File.ReadAllLines(pathToCSV);
-            var csvDT = ParseToDataTable(csvText);
+            var csvDT = ParseToDataTable(csvText,separator);
 
             SqlBulkCopy objbulk = new SqlBulkCopy(_dbconnection);
             //assigning Destination table name    
@@ -40,13 +35,20 @@ namespace Utilities
             _dbconnection.Close();
         }
 
-        private DataTable ParseToDataTable(string[] csvText)
+        private void CreateColumns(DataTable tblcsv, string header, char separator)
+        {
+            string[] columnsNames = header.Split(separator);
+            foreach (var columnName in columnsNames)
+                tblcsv.Columns.Add(columnName);
+        }
+
+        private DataTable ParseToDataTable(string[] csvText, char separator)
         {
             //Creating object of datatable  
             DataTable tblcsv = new DataTable();
 
             //creating columns  
-            CreateColumns(tblcsv, csvText[0]);
+            CreateColumns(tblcsv, csvText[0],separator);
             foreach (string csvRow in csvText[1..])
             {
                 if (!string.IsNullOrEmpty(csvRow))
@@ -54,7 +56,7 @@ namespace Utilities
                     //Adding each row into datatable  
                     tblcsv.Rows.Add();
                     int count = 0;
-                    foreach (string FileRec in csvRow.Split(','))
+                    foreach (string FileRec in csvRow.Split(separator))
                     {
                         tblcsv.Rows[tblcsv.Rows.Count - 1][count] = FileRec;
                         count++;
@@ -65,13 +67,5 @@ namespace Utilities
         }
 
         //Function to Insert Records  
-   
-
-        private void CreateColumns(DataTable tblcsv, string v)
-        {
-            string[] columnsNames = v.Split(Separator);
-            foreach (var columnName in columnsNames)
-                tblcsv.Columns.Add(columnName);
-        }
     }
 }
