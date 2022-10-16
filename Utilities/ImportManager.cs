@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace Utilities
@@ -42,7 +41,7 @@ namespace Utilities
                 tblcsv.Columns.Add(columnName);
         }
 
-        private DataTable ParseToDataTable(string[] csvText, char separator)
+        public DataTable ParseToDataTable(string[] csvText, char separator)
         {
             //Creating object of datatable  
             DataTable tblcsv = new DataTable();
