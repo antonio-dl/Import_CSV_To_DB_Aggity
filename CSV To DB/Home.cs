@@ -42,9 +42,9 @@ namespace CSV_To_DB
             {
                 importManager.ImportCSVToDatabase(pathCSV_textBox.Text, separator[0]);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message,"Error",MessageBoxButtons.OKCancel);
             }
 
         }
