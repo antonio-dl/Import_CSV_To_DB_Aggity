@@ -10,8 +10,10 @@ namespace CSV_To_DB
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
+
+            string configPath = Path.Combine(Path.GetTempPath(), "CSV_To_DB", "config"); 
             ApplicationConfiguration.Initialize();
-            Application.Run(new Home());
+            Application.Run(new Home(configPath));
         }
     }
 }

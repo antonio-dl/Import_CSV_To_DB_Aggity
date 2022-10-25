@@ -19,15 +19,20 @@ namespace Utilities
         public string DestinationTable { get; private set; }
         public void ImportCSVToDatabase(string pathToCSV, char separator)
         {
-            var csvText = File.ReadAllLines(pathToCSV);
-            var csvDT = ParseToDataTable(csvText,separator);
+            var csvDT = ParseToDataTable(pathToCSV, separator);
+            ImportCSVToDatabase(csvDT);
 
+
+        }
+
+        public void ImportCSVToDatabase(DataTable csvDT)
+        {
             SqlBulkCopy objbulk = new SqlBulkCopy(_dbconnection);
             //assigning Destination table name    
             objbulk.DestinationTableName = DestinationTable;
             //Mapping Table column    
             foreach (DataColumn column in csvDT.Columns)
-                objbulk.ColumnMappings.Add(column.ColumnName,column.ColumnName);
+                objbulk.ColumnMappings.Add(column.ColumnName, column.ColumnName);
             //inserting Datatable Records to DataBase    
             _dbconnection.Open();
             objbulk.WriteToServer(csvDT);
@@ -41,14 +46,15 @@ namespace Utilities
                 tblcsv.Columns.Add(columnName);
         }
 
-        public DataTable ParseToDataTable(string[] csvText, char separator)
+        public DataTable ParseToDataTable(string pathToCSV, char separator)
         {
+            var csvTextLines = File.ReadAllLines(pathToCSV);
             //Creating object of datatable  
             DataTable tblcsv = new DataTable();
 
             //creating columns  
-            CreateColumns(tblcsv, csvText[0],separator);
-            foreach (string csvRow in csvText[1..])
+            CreateColumns(tblcsv, csvTextLines[0],separator);
+            foreach (string csvRow in csvTextLines[1..])
             {
                 if (!string.IsNullOrEmpty(csvRow))
                 {
@@ -65,6 +71,12 @@ namespace Utilities
             return tblcsv;
         }
 
-        //Function to Insert Records  
+        public void CreateTable(DataTable dataTable)
+        {
+            TableCreator tc = new TableCreator(this.DestinationTable, this.ConnectionString);
+
+            tc.CreateTable(dataTable);
+        }
+
     }
 }

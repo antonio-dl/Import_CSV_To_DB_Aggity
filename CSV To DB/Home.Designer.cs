@@ -36,6 +36,8 @@
             this.button_selectFile = new System.Windows.Forms.Button();
             this.separator_comboBox = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.nuovaTable_checkBox = new System.Windows.Forms.CheckBox();
+            this.checkConnection_button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // connectionString_textBox1
@@ -46,6 +48,7 @@
             this.connectionString_textBox1.Size = new System.Drawing.Size(312, 27);
             this.connectionString_textBox1.TabIndex = 0;
             this.connectionString_textBox1.Text = "Connection String";
+            this.connectionString_textBox1.Leave += new System.EventHandler(this.connectionString_TextLeave);
             // 
             // pathCSV_textBox
             // 
@@ -102,7 +105,6 @@
             this.separator_comboBox.Items.AddRange(new object[] {
             ";",
             ","});
-            this.separator_comboBox.SelectedIndex = 0;
             this.separator_comboBox.Location = new System.Drawing.Point(216, 66);
             this.separator_comboBox.Name = "separator_comboBox";
             this.separator_comboBox.Size = new System.Drawing.Size(152, 28);
@@ -116,13 +118,35 @@
             this.label2.Size = new System.Drawing.Size(112, 20);
             this.label2.TabIndex = 7;
             this.label2.Text = "Separatore CSV";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
+            // 
+            // nuovaTable_checkBox
+            // 
+            this.nuovaTable_checkBox.AutoSize = true;
+            this.nuovaTable_checkBox.Location = new System.Drawing.Point(56, 217);
+            this.nuovaTable_checkBox.Name = "nuovaTable_checkBox";
+            this.nuovaTable_checkBox.Size = new System.Drawing.Size(132, 24);
+            this.nuovaTable_checkBox.TabIndex = 8;
+            this.nuovaTable_checkBox.Text = "Nuova Tabella?";
+            this.nuovaTable_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // checkConnection_button
+            // 
+            this.checkConnection_button.Location = new System.Drawing.Point(387, 133);
+            this.checkConnection_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.checkConnection_button.Name = "checkConnection_button";
+            this.checkConnection_button.Size = new System.Drawing.Size(99, 27);
+            this.checkConnection_button.TabIndex = 9;
+            this.checkConnection_button.Text = "Check";
+            this.checkConnection_button.UseVisualStyleBackColor = true;
+            this.checkConnection_button.Click += new System.EventHandler(this.CheckConnection_Click);
             // 
             // Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 409);
+            this.Controls.Add(this.checkConnection_button);
+            this.Controls.Add(this.nuovaTable_checkBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.separator_comboBox);
             this.Controls.Add(this.button_selectFile);
@@ -150,6 +174,8 @@
         private System.Windows.Forms.Button button_selectFile;
         private ComboBox separator_comboBox;
         private Label label2;
+        private CheckBox nuovaTable_checkBox;
+        private Button checkConnection_button;
     }
 }
 
