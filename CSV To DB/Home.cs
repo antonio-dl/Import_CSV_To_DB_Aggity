@@ -27,6 +27,7 @@ namespace CSV_To_DB
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(_configPath));
             }
+            this.separator_comboBox.SelectedIndex = 0;
         }
 
 
@@ -96,6 +97,11 @@ namespace CSV_To_DB
 
                 MessageBox.Show(aex.Message, "Error", MessageBoxButtons.OK);
             }
+        }
+
+        private void separator_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

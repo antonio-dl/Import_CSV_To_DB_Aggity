@@ -15,68 +15,56 @@ namespace Utilities
         public string DestinationTable { get; }
         public string ConnectionString { get; }
 
-        internal void CreateTable(DataTable dataTable)
+
+
+        private string CreateTableSQL(DataTable table)
         {
-            
-        }
-
-        private void CreateTableFromSchema(DataTable dt)
-        {
-            // Drop the new table if it is already there.
-
-            StringBuilder sqlCmd = new StringBuilder(
-            "if exists (SELECT * FROM dbo.sysobjects WHERE id = " +
-            "object_id([" + DestinationTable + "]) " +
-            "AND OBJECTPROPERTY(id, IsUserTable) = 1)" +
-            Environment.NewLine +
-            "DROP TABLE " + DestinationTable + ";" + Environment.NewLine +
-            Environment.NewLine);
-
-            // Start building a command string to create the table.
-            sqlCmd.Append("CREATE TABLE [" + DestinationTable + "] (" +
-            Environment.NewLine);
-            // Iterate over the column collection in the source table.
-            foreach (DataColumn col in dt.Columns)
+            string sqlsc;
+            sqlsc = "CREATE TABLE " + DestinationTable + "(";
+            for (int i = 0; i < table.Columns.Count; i++)
             {
-                // Add the column.
-                sqlCmd.Append("[" + col.ColumnName + "] ");
-                // Map the source column type to a SQL Server type.
-                sqlCmd.Append(NetType2SqlType(col.DataType.ToString(),
-                col.MaxLength) + " ");
-                // Add identity information.
-                if (col.AutoIncrement)
-                    sqlCmd.Append("IDENTITY ");
-                // Add AllowNull information.
-                sqlCmd.Append((col.AllowDBNull ? "" : "NOT ") + "NULL," +
-                Environment.NewLine);
-            }
-            sqlCmd.Remove(sqlCmd.Length - (Environment.NewLine.Length + 1), 1);
-            sqlCmd.Append(") ON [PRIMARY];" + Environment.NewLine +
-            Environment.NewLine);
-
-            // Add the primary key to the table, if it exists.
-            if (dt.PrimaryKey != null)
-            {
-                sqlCmd.Append("ALTER TABLE " + DestinationTable +
-                " WITH NOCHECK ADD " + Environment.NewLine);
-                sqlCmd.Append("CONSTRAINT [PK_" + DestinationTable +
-                "] PRIMARY KEY CLUSTERED (" + Environment.NewLine);
-                // Add the columns to the primary key.
-                foreach (DataColumn col in dt.PrimaryKey)
+                sqlsc += "\n [" + table.Columns[i].ColumnName + "] ";
+                string columnType = table.Columns[i].DataType.ToString();
+                switch (columnType)
                 {
-                    sqlCmd.Append("[" + col.ColumnName + "]," +
-                    Environment.NewLine);
+                    case "System.Int32":
+                        sqlsc += " int ";
+                        break;
+                    case "System.Int64":
+                        sqlsc += " bigint ";
+                        break;
+                    case "System.Int16":
+                        sqlsc += " smallint";
+                        break;
+                    case "System.Byte":
+                        sqlsc += " tinyint";
+                        break;
+                    case "System.Decimal":
+                        sqlsc += " decimal ";
+                        break;
+                    case "System.DateTime":
+                        sqlsc += " datetime ";
+                        break;
+                    case "System.String":
+                    default:
+                        sqlsc += string.Format(" nvarchar({0}) ", table.Columns[i].MaxLength == -1 ? "max" : table.Columns[i].MaxLength.ToString());
+                        break;
                 }
-                sqlCmd.Remove(sqlCmd.Length -
-                (Environment.NewLine.Length + 1), 1);
-                sqlCmd.Append(") ON [PRIMARY];" + Environment.NewLine +
-                Environment.NewLine);
+                if (table.Columns[i].AutoIncrement)
+                    sqlsc += " IDENTITY(" + table.Columns[i].AutoIncrementSeed.ToString() + "," + table.Columns[i].AutoIncrementStep.ToString() + ") ";
+                if (!table.Columns[i].AllowDBNull)
+                    sqlsc += " NOT NULL ";
+                sqlsc += ",";
             }
+            return sqlsc.Substring(0, sqlsc.Length - 1) + "\n)";
+        }
+        public void CreateTable(DataTable dt)
+        {
+            var sqlCmd = CreateTableSQL(dt);
 
-
-            // Create and execute the command to create the new table.
+            Console.WriteLine(sqlCmd);
             SqlConnection conn = new SqlConnection(this.ConnectionString);
-            SqlCommand cmd = new SqlCommand(sqlCmd.ToString(), conn);
+            SqlCommand cmd = new SqlCommand(sqlCmd, conn);
             conn.Open();
             cmd.ExecuteNonQuery();
             conn.Close();

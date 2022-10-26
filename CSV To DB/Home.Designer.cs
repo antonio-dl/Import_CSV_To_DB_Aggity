@@ -109,6 +109,7 @@
             this.separator_comboBox.Name = "separator_comboBox";
             this.separator_comboBox.Size = new System.Drawing.Size(152, 28);
             this.separator_comboBox.TabIndex = 6;
+            this.separator_comboBox.SelectedIndexChanged += new System.EventHandler(this.separator_comboBox_SelectedIndexChanged);
             // 
             // label2
             // 
